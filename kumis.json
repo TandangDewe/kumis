@@ -1,0 +1,42 @@
+{
+  "country" : "Indonesia",
+  "code_id" : "ID",
+  "post_code" : [
+    {
+      "code" : 1,
+      "zone" : ["Jakarta", "Banten", "Jawa Barat"]
+    },
+    {
+      "code" : 2,
+      "zone" : ["Aceh", "Sumatra Utara", "Sumatra Barat", "Riau", "Kepulauan Riau"]
+    },
+    {
+      "code" : 3,
+      "zone" : ["Bengkulu", "Jambi", "Bangka Belitung", "Sumatra Selatan", "Lampung"]
+    },
+    {
+      "code" : 4,
+      "zone" : ["Banten", "Jawa Barat"]
+    },
+    {
+      "code" : 5,
+      "zone" : ["Jawa Tengah", "Yogyakarta"]
+    },
+    {
+      "code" : 6,
+      "zone" : ["Jawa Timur"]
+    },
+    {
+      "code" : 7,
+      "zone" : ["Kalimantan"]
+    },
+    {
+      "code" : 8,
+      "zone" : ["Bali", "Nusa Tenggara"]
+    },
+    {
+      "code" : 9,
+      "zone" : ["Sulawesi", "Maluku", "Papua"]
+    }
+  ]
+}
