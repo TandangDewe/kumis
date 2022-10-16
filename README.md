@@ -32,7 +32,7 @@ Replace content with value returned from `VariableCb`. Kumis don't make any inte
 ```
 {{#section_name}}
 ...Content of section...
-{{#section_name}}
+{{/section_name}}
 ```
 Section is analogue of `while` in pascal. For every new section, new iterator will be created (TVarRec with zero-based integer value). If `SectionCb` return True, section will be processed repeatedly until it return False. Like `variable_name`, it's your responsibility to interpreted `section_name`.
 
@@ -40,7 +40,7 @@ Section is analogue of `while` in pascal. For every new section, new iterator wi
 ```
 {{?section_name}}
 ...Content of section...
-{{#section_name}}
+{{/section_name}}
 ```
 Sections Once  analogue of `if` in pascal. If `SectionCb` return True, section will processed once. New iterator is *not* created inside 'content of section'. But inside `SectionCb` callback, new iterator created with 0 (zero) value.
 
@@ -48,7 +48,7 @@ Sections Once  analogue of `if` in pascal. If `SectionCb` return True, section w
 ```
 {{^section_name}}
 ...Content of section...
-{{#section_name}}
+{{/section_name}}
 ```
 Similar with Sections Once, but the logic is inverted.
 
