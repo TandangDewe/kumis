@@ -61,6 +61,9 @@ Change delimiter. Make sure separated `new_start_delimiter` and `new_end_delimit
 ## Example
 In kumistest.lpr you can find simple (but not very efficient) example for parse and render with Kumis using json data. 
 
+## License
+LGPL with static linking exception (see COPYING.modifiedLGPL and COPYING.LGPL).
+
 ## Additional Information
 * It's in alpha state.
 * I write Kumis with simplicity dan readability in mind. Put extra layer of protection if you get template and/or data from untrusted source.
