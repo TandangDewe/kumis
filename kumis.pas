@@ -13,11 +13,12 @@ const
   MAX_SECTION_DEEP = 16;
   CHANGETAG_CHAR = '=';
   CharLookup = '#' {ksSectionBegin} + '?' {ksSectionOnce} +
-    '^' {ksSectionInvBegin} + '/' {ksSectionEnd} + CHANGETAG_CHAR {ksChangeTag};
+    '^' {ksSectionInvBegin} + '/' {ksSectionEnd} + '>' {ksPartials} +
+    CHANGETAG_CHAR {ksChangeTag};
 
 type
   TKumisElType = (ksString, ksVar, ksSectionBegin, ksSectionOnce, ksSectionInvBegin,
-    ksSectionEnd, ksChangeTag);
+    ksSectionEnd, ksPartials, ksChangeTag);
 
   TKumisEl = record
     AType: TKumisElType;
@@ -31,10 +32,15 @@ type
     Data: Pointer): boolean;
   TVariableEvent = function(const AName: string; const Iterator: array of const;
     Data: Pointer): string;
+  TPartialsEvent = function(const AName: String): TKumisElArr;
 
 function Parse(const TplStr: string): TKumisElArr;
 function Render(const Tpl: TKumisElArr; SectionCb: TSectionEvent;
-  VariableCb: TVariableEvent; Data: Pointer = nil): string;
+  VariableCb: TVariableEvent; PartialsCb: TPartialsEvent;
+  Data: Pointer = nil): string;
+function DoRender(const Tpl: TKumisElArr; SectionCb: TSectionEvent;
+  VariableCb: TVariableEvent; PartialsCb: TPartialsEvent; var Iterator: array
+  of TVarRec; var IteratorPos: Integer; Data: Pointer = nil): string;
 
 implementation
 
@@ -153,6 +159,12 @@ begin
               RefElement := ResultCount;
             end;
           end;
+          ksPartials:
+          begin
+            GrowToSave(Result, ResultCount);
+            SaveToElement(Result[ResultCount], ElType, PTagBegin + 1, PTagEnd);
+            Inc(ResultCount);
+          end;
           ksChangeTag:
           begin
             PSpace := WalkUntil(' ', PTagBegin + 1, PTagEnd);
@@ -172,11 +184,22 @@ begin
 end;
 
 function Render(const Tpl: TKumisElArr; SectionCb: TSectionEvent;
-  VariableCb: TVariableEvent; Data: Pointer = nil): string;
+  VariableCb: TVariableEvent; PartialsCb: TPartialsEvent;
+  Data: Pointer = nil): string;
+var
+  Iterator: array of TVarRec;
+  IteratorPos: Integer;
+begin
+  IteratorPos := -1;
+  SetLength(Iterator, MAX_SECTION_DEEP);
+  Result:= DoRender(Tpl,SectionCb,VariableCb,PartialsCb,Iterator,IteratorPos,Data);
+end;
+
+function DoRender(const Tpl: TKumisElArr; SectionCb: TSectionEvent;
+  VariableCb: TVariableEvent; PartialsCb: TPartialsEvent; var Iterator: array
+  of TVarRec; var IteratorPos: Integer; Data: Pointer ): string;
 var
   P: integer;
-  Iterator: array of TVarRec;
-  IteratorPos: integer;
 
   procedure RenderSection(Step: integer; Invert: boolean);
   begin
@@ -193,8 +216,6 @@ var
 
 begin
   P := 0;
-  SetLength(Iterator, MAX_SECTION_DEEP);
-  IteratorPos := -1;
   Result := '';
   while P < Length(Tpl) do
   begin
@@ -216,6 +237,11 @@ begin
           P := Tpl[P].RefElement
         else
           Dec(IteratorPos);
+      end;
+      ksPartials:
+      begin
+        Result:= Result + DoRender(PartialsCb(Tpl[P].Value),SectionCb,VariableCb,
+          PartialsCb,Iterator,IteratorPos,Data);
       end;
       else
         raise Exception.Create('Ilegal element type.');

@@ -1,5 +1,7 @@
 program kumistest;
 
+{$mode ObjFPC}{$H+}
+
 uses
   Kumis,
   Classes,
@@ -35,9 +37,25 @@ begin
   Result:= Node.AsString;
 end;
 
+function GetTemplate(const AName: String): TKumisElArr;
+var
+  TemplateFile: TFileStream = nil;
+  TemplateString: String;
+begin
+  Result:= Nil;
+  try
+    TemplateFile:= TFileStream.Create(AName+'.tpl',fmOpenRead);
+    SetLength(TemplateString,TemplateFile.Size);
+    TemplateFile.Read(TemplateString[1],TemplateFile.Size);
+    Result:= Parse(TemplateString);
+  finally
+    TemplateFile.Free;
+  end;
+end;
+
 function RenderJson(const Tpl: TKumisElArr; Data: TJSONData): String;
 begin
-  Result:= Render(Tpl,@GetSectionJSON,@GetVariableJSON,Data);
+  Result:= Render(Tpl,@GetSectionJSON,@GetVariableJSON,@GetTemplate, Data);
 end;
 
 procedure Dump(const Tpl: TKumisElArr);
@@ -58,8 +76,6 @@ procedure DoTest;
 var
   DataFile: TFileStream = nil;
   Data: TJSONData = nil;
-  TemplateFile: TFileStream = nil;
-  TemplateString: String;
   Template: TKumisElArr;
   RenderString: String;
   RenderFile: TFileStream = nil;
@@ -69,13 +85,10 @@ begin
     DataFile := TFileStream.Create('kumis.json', fmOpenRead);
     Data := GetJSON(DataFile);
 
-    { load template }
-    TemplateFile:= TFileStream.Create('kumis.tpl',fmOpenRead);
-    SetLength(TemplateString,TemplateFile.Size);
-    TemplateFile.Read(TemplateString[1],TemplateFile.Size);
+    { load and parsing template }
+    Template:= GetTemplate('kumis');
 
-    { parsing }
-    Template:= Parse(TemplateString);
+    { dump }
     Dump(Template);
 
     { render }
@@ -85,7 +98,6 @@ begin
 
   finally
     RenderFile.Free;
-    TemplateFile.Free;
     Data.Free;
     DataFile.Free;
   end;

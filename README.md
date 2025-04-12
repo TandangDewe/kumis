@@ -2,12 +2,13 @@
 Simple, Mustache-like, template engine implemented in Free Pascal.
 
 ## Using Kumis
-Kumis only has 2 function and 2 callback.
+Kumis only has 2 function and 3 callback.
 
 Function :
 ```pascal
 function Parse(const TplStr: string): TKumisElArr;
-function Render(const Tpl: TKumisElArr; SectionCb: TSectionEvent; VariableCb: TVariableEvent;
+function Render(const Tpl: TKumisElArr; SectionCb: TSectionEvent; 
+  VariableCb: TVariableEvent; PartialsCb: TPartialsEvent;
   Data: Pointer = nil): string;
 ```
 
@@ -17,6 +18,7 @@ TSectionEvent = function(const AName: string; const Iterator: array of const;
   Data: Pointer): boolean;
 TVariableEvent = function(const AName: string; const Iterator: array of const;
   Data: Pointer): string;
+TPartialsEvent = function(const AName: String): TKumisElArr; 
 ```
 
 ## Template Format
@@ -51,6 +53,12 @@ Sections Once  analogue of `if` in pascal. If `SectionCb` return True, section w
 {{/section_name}}
 ```
 Similar with Sections Once, but the logic is inverted.
+
+### Partial
+```
+{{>other_template}}
+```
+Render time include other template. `PartialsCb` reponsible for load and parsing template.
 
 ### Set Delimiter
 ```

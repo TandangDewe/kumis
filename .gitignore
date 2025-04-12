@@ -1,6 +1,7 @@
 backup/
 lib/
 kumistest
+kumistest.exe
 kumis.html
 *.dbg
 *.lps
